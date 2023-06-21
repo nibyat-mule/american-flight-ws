@@ -36,7 +36,7 @@ payload map ( payload01 , indexOfPayload01 ) -> {
 			</ee:message>
 		</ee:transform>
 	</flow>
-	<flow name="american-flight-wsFlow1" doc:id="e3a3bd0d-ce9d-49d5-920d-79e2bcebab28" >
+	<flow name="get-flight-by-ID" doc:id="e3a3bd0d-ce9d-49d5-920d-79e2bcebab28" >
 		<db:select doc:name="Select" doc:id="923b69b0-e909-47fe-8363-fd2251fa8832" config-ref="American_Flight_Database_Config">
 			<db:sql ><![CDATA[SELECT * FROM american WHERE ID = :ID]]></db:sql>
 			<db:input-parameters ><![CDATA[#['ID' : message.attributes.uriParams.ID]]]></db:input-parameters>

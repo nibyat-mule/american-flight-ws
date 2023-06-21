@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
-    <apikit:config name="american-flight-sapi-config" api="resource::b083e301-5de6-4110-bebd-a15de72088f7:american-flight-sapi:1.0.0:raml:zip:american-flight-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <flow name="american-flight-sapi-main">
-        <http:listener config-ref="HTTP_Listener_config" path="/api/*">
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <http:listener-config name="america_flight_sapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8082" />
+    </http:listener-config>
+    <apikit:config name="america_flight_sapi-config" api="resource::3a59cf6d-3f23-4150-97dd-5a98506b4360:america_flight_sapi:1.0.0:raml:zip:america_flight_sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="america_flight_sapi-main">
+        <http:listener config-ref="america_flight_sapi-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:response>
@@ -11,10 +14,10 @@
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="american-flight-sapi-config" />
+        <apikit:router config-ref="america_flight_sapi-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
-                <ee:transform>
+                <ee:transform doc:name="Transform Message">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -27,7 +30,7 @@ output application/json
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_FOUND">
-                <ee:transform>
+                <ee:transform doc:name="Transform Message">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -40,7 +43,7 @@ output application/json
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
-                <ee:transform>
+                <ee:transform doc:name="Transform Message">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -53,7 +56,7 @@ output application/json
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
-                <ee:transform>
+                <ee:transform doc:name="Transform Message">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -66,7 +69,7 @@ output application/json
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
-                <ee:transform>
+                <ee:transform doc:name="Transform Message">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -79,7 +82,7 @@ output application/json
                 </ee:transform>
             </on-error-propagate>
             <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
-                <ee:transform>
+                <ee:transform doc:name="Transform Message">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -93,8 +96,8 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="american-flight-sapi-console">
-        <http:listener config-ref="HTTP_Listener_config" path="/console/*">
+    <flow name="america_flight_sapi-console">
+        <http:listener config-ref="america_flight_sapi-httpListenerConfig" path="/console/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:response>
@@ -103,10 +106,10 @@ output application/json
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:console config-ref="american-flight-sapi-config" />
+        <apikit:console config-ref="america_flight_sapi-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:NOT_FOUND">
-                <ee:transform>
+                <ee:transform doc:name="Transform Message">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -120,93 +123,114 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="put:\flights\(ID):application\json:american-flight-sapi-config">
-        <ee:transform>
+    <flow name="put:\flights\(ID):application\json:america_flight_sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="62145b40-16b4-4ad1-afb6-5367cb2885a2" name="get-flight-by-ID"/>
+    </flow>
+    <flow name="delete:\flights\(ID):america_flight_sapi-config">
+        <ee:transform doc:name="Transform Message">
             <ee:variables>
                 <ee:set-variable variableName="ID">attributes.uriParams.'ID'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <ee:transform>
+        <ee:transform doc:name="Transform Message">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+"Flight Deleted"]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="patch:\flights\(ID):application\json:america_flight_sapi-config">
+        <ee:transform doc:name="Transform Message">
+            <ee:variables>
+                <ee:set-variable variableName="ID">attributes.uriParams.'ID'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
-  message: "fligt updated"
+  message: "Flight Updated"
 }]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
-    <flow name="delete:\flights\(ID):american-flight-sapi-config">
-        <ee:transform>
-            <ee:variables>
-                <ee:set-variable variableName="ID">attributes.uriParams.'ID'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform>
+    <flow name="get:\flights:america_flight_sapi-config">
+        <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{
-  message: "fligt deleted"
-}]]></ee:set-payload>
+[
+  {
+    ID: 1,
+    code: "AF101",
+    price: 400,
+    departureDate: "25/08/2023",
+    origin: "CLE",
+    destination: "SFO",
+    emptyseats: 0,
+    plane: {
+      "type": "Boing 777",
+      totalseats: 20
+    }
+  }, 
+  {
+    ID: 2,
+    code: "AF102",
+    price: 600,
+    departureDate: "25/08/2023",
+    origin: "CLE",
+    destination: "SFO",
+    emptyseats: 12,
+    plane: {
+      "type": "Boing 787",
+      totalseats: 200
+    }
+  }
+]]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
-    <flow name="patch:\flights\(ID):application\json:american-flight-sapi-config">
-        <ee:transform>
+    <flow name="get:\flights\(ID):america_flight_sapi-config">
+        <ee:transform doc:name="Transform Message">
             <ee:variables>
                 <ee:set-variable variableName="ID">attributes.uriParams.'ID'</ee:set-variable>
             </ee:variables>
         </ee:transform>
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  message: "fligt updated"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
-    </flow>
-    <flow name="get:\flights:american-flight-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="92f7059c-b889-459f-8980-5f661ccf92c9" name="get-all-flights"/>
-    </flow>
-    <flow name="get:\flights\(ID):american-flight-sapi-config">
-        <ee:transform>
-            <ee:variables>
-                <ee:set-variable variableName="ID">attributes.uriParams.'ID'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform>
+        <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
   ID: 1,
-  code: "AF-1001",
+  code: "AF101",
   price: 400,
-  emptySeats: 100,
+  departureDate: "25/08/2023",
+  origin: "CLE",
   destination: "SFO",
-  departureDate: "2022/11/09",
-  planeType: {
-    "type": "Boeing",
-    totalSeats: 200
+  emptyseats: 0,
+  plane: {
+    "type": "Boing 777",
+    totalseats: 20
   }
 }]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
-    <flow name="post:\flights:application\json:american-flight-sapi-config">
-        <ee:transform>
+    <flow name="post:\flights:application\json:america_flight_sapi-config">
+        <ee:transform doc:name="Transform Message">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-"fligt added"]]></ee:set-payload>
+{
+  message: "Flight Added"
+}]]></ee:set-payload>
             </ee:message>
         </ee:transform>
     </flow>
